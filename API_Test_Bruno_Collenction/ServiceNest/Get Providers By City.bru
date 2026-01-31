@@ -1,0 +1,15 @@
+meta {
+  name: Get Providers By City
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/discovery/cities/2/providers
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

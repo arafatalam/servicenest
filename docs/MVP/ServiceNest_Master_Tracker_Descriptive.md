@@ -219,14 +219,14 @@ Checkpoint:
 
 ---
 
-# SLICE 4 — DISCOVERY DATA
+# SLICE 4 — DISCOVERY DATA [DONE]
 
 ## Goal
 Enable browsing by city and category.
 
 ### Tasks
 - Create migrations
-- Seed initial data
+- [DONE] Seed initial data (cities + categories + realistic dev dataset for testing)
 - Build browse endpoints
 
 Checkpoint:

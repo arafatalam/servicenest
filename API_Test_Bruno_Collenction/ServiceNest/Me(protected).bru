@@ -1,7 +1,7 @@
 meta {
   name: Me(protected)
   type: http
-  seq: 3
+  seq: 4
 }
 
 get {
@@ -10,6 +10,11 @@ get {
   auth: inherit
 }
 
+headers {
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50SWQiOiIzIiwicm9sZSI6ImNsaWVudCIsImlhdCI6MTc2OTg2Nzg4MSwiZXhwIjoxNzY5OTU0MjgxfQ._6sdfLI47fQ8lbXoC6iW9gQfKsrkbb5kjoii5DtsCvQ
+}
+
 settings {
   encodeUrl: true
+  timeout: 0
 }
