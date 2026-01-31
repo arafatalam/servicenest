@@ -15,17 +15,16 @@ Designed so that:
 
 When continuing this project, the assistant **MUST** follow this exact method:
 
-1) Show **full copy-pastable code at the BEGINNING** of a step  
-2) Teach **one file at a time**  
-3) Teach **one line at a time**  
-4) If a line depends on another file: **pause → jump → explain → return**  
-5) Every explanation MUST include:  
-   - Plain-English meaning  
-   - **Very easy metaphor** (house, door, switch, box, etc.)  
-6) Steps MUST be **tiny** (1 line or 1 small concept)  
-7) End every step with: **STOP + confirmation**
+1) Show the **FULL copy-pastable file at the BEGINNING** of a step  
+2) Teach **one file at a time** (no multi-file mixing)  
+3) Explain the file **line-by-line in plain English**  
+4) Use **simple, beginner-friendly metaphors** where suitable (house, door, switch, box, etc.)  
+5) Show the **SAME FULL file AGAIN at the END** of the step (clean re-copy)  
+6) Provide a **runnable DEMO** (commands + expected output) **BEFORE** asking for confirmation  
+7) End every step with **STOP + confirmation** (user replies **DONE** or **ERROR**)
 
-If this method is not followed, the build is considered **invalid**.
+If this method is not followed, the build is considered **INVALID**.
+
 
 ---
 
@@ -84,17 +83,17 @@ Reason:
 
 ## S1.03 — Backend skeleton (ESM)
 ### app.js
-- [ ] S1.03.01 Create `backend/src/` folder
-- [ ] S1.03.02 Create `backend/src/routes/` folder
-- [ ] S1.03.03 Create `backend/src/app.js`
-- [ ] S1.03.04 Add import line: `express`
-- [ ] S1.03.05 Add import line: `cors`
-- [ ] S1.03.06 Add import line: routes
-- [ ] S1.03.07 Create `app = express()`
-- [ ] S1.03.08 Add `app.use(cors())`
-- [ ] S1.03.09 Add `app.use(express.json())`
-- [ ] S1.03.10 Add `app.use("/api", routes)`
-- [ ] S1.03.11 Add `export default app`
+- [DONE] S1.03.01 Create `backend/src/` folder
+- [DONE] S1.03.02 Create `backend/src/routes/` folder
+- [DONE] S1.03.03 Create `backend/src/app.js`
+- [DONE] S1.03.04 Add import line: `express`
+- [DONE] S1.03.05 Add import line: `cors`
+- [DONE] S1.03.06 Add import line: routes
+- [DONE] S1.03.07 Create `app = express()`
+- [DONE] S1.03.08 Add `app.use(cors())`
+- [DONE] S1.03.09 Add `app.use(express.json())`
+- [DONE] S1.03.10 Add `app.use("/api", routes)`
+- [DONE] S1.03.11 Add `export default app`
 
 ### routes/index.js
 - [ ] S1.03.12 Create `backend/src/routes/index.js`
