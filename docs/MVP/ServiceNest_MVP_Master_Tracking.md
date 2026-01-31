@@ -38,8 +38,8 @@ This version is slice-based (frontend + backend built side-by-side) while stayin
 # SLICE 1 — PROJECT BOOTSTRAP (BACKEND + FRONTEND)
 
 ## S1.01 — Repo structure
-- [ ] Create /backend and /frontend
-- [ ] Add root .gitignore
+- [DONE] Create /backend and /frontend
+- [DONE] Add root .gitignore
 
 ## S1.02 — Backend init
 - [ ] cd backend → npm init -y
