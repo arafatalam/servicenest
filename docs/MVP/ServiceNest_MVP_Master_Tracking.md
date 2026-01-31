@@ -36,15 +36,26 @@ This version is slice-based (frontend + backend built side-by-side) while stayin
 ---
 
 # SLICE 1 — PROJECT BOOTSTRAP (BACKEND + FRONTEND)
+### 🔧 Backend Module System Note (ESM)
+
+- Backend uses **Node.js ESM (ECMAScript Modules)** instead of CommonJS
+- `package.json` includes `"type": "module"`
+- All backend files use `import / export` syntax
+- Decision made during **S1.02 (Backend init)** before S1.03
+
+Reason:
+- Aligns with modern Node.js standards
+- Avoids future refactors when adding tooling (Swagger, ESLint, etc.)
+
 
 ## S1.01 — Repo structure
 - [DONE] Create /backend and /frontend
 - [DONE] Add root .gitignore
 
 ## S1.02 — Backend init
-- [ ] cd backend → npm init -y
-- [ ] Install: express dotenv cors
-- [ ] Install dev: nodemon
+- [DONE] cd backend → npm init -y
+- [DONE] Install: express dotenv cors
+- [DONE] Install dev: nodemon
 
 ## S1.03 — Backend skeleton
 - [ ] Create backend/src/app.js
