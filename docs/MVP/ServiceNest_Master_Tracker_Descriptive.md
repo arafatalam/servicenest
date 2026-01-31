@@ -1,5 +1,5 @@
 
-# 🪺 ServiceNest — MVP v1.0 Master Tracker (Realistic + Descriptive Edition)
+# 🪺 ServiceNest — MVP v1.0 Master Tracker (Descriptive Edition)
 
 ## Purpose
 This tracker organizes ServiceNest MVP development into meaningful, testable milestones that reflect real developer workflow.
