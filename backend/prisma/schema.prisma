@@ -7,9 +7,335 @@ datasource db {
 }
 
 model HealthCheck {
-  id        Int      @id @default(autoincrement())
+  id        BigInt   @id @default(autoincrement())
   note      String   @db.VarChar(100)
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("health_check")
+}
+
+model Account {
+  accountId       BigInt    @id @default(autoincrement()) @map("account_id")
+  email           String    @unique @db.VarChar(255)
+  passwordHash    String    @map("password_hash") @db.VarChar(255)
+  role            String    @db.VarChar(20)
+  status          String    @db.VarChar(20)
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  lastLoginAt     DateTime? @map("last_login_at")
+
+  clientProfile   ProfileClient?
+  providerProfile ProfileProvider?
+
+  auditLogsPerformed AuditLog[] @relation("audit_performed_by")
+  fieldRulesUpdated  FieldRule[] @relation("field_rule_updated_by")
+
+  @@map("account")
+}
+
+model AuditLog {
+  auditId              BigInt   @id @default(autoincrement()) @map("audit_id")
+  performedByAccountId BigInt   @map("performed_by_account_id")
+  action               String   @db.VarChar(20)
+  entityType           String   @map("entity_type") @db.VarChar(50)
+  entityId             String   @map("entity_id") @db.VarChar(64)
+  beforeJson           Json?    @map("before_json")
+  afterJson            Json?    @map("after_json")
+  reason               String?  @db.VarChar(255)
+  performedAt          DateTime @default(now()) @map("performed_at")
+
+  performedBy          Account  @relation("audit_performed_by", fields: [performedByAccountId], references: [accountId])
+
+  @@index([performedByAccountId])
+  @@map("audit_log")
+}
+
+model FieldRule {
+  fieldRuleId      BigInt   @id @default(autoincrement()) @map("field_rule_id")
+  entityType       String   @map("entity_type") @db.VarChar(30)
+  fieldName        String   @map("field_name") @db.VarChar(60)
+  editableByRole   String   @map("editable_by_role") @db.VarChar(20)
+  isEditable       Boolean  @map("is_editable")
+  isVisible        Boolean  @map("is_visible")
+  updatedByAdminId BigInt   @map("updated_by_admin_id")
+  updatedAt        DateTime @default(now()) @map("updated_at")
+
+  updatedByAdmin   Account  @relation("field_rule_updated_by", fields: [updatedByAdminId], references: [accountId])
+
+  @@index([updatedByAdminId])
+  @@map("field_rule")
+}
+
+model ProfileClient {
+  clientId        BigInt   @id @map("client_id")
+  firstName       String   @map("first_name") @db.VarChar(60)
+  lastName        String   @map("last_name") @db.VarChar(60)
+  phone           String?  @db.VarChar(30)
+  profilePhotoUrl String?  @map("profile_photo_url") @db.VarChar(255)
+  addressLine1    String?  @map("address_line1") @db.VarChar(120)
+  addressLine2    String?  @map("address_line2") @db.VarChar(120)
+  postalCode      String?  @map("postal_code") @db.VarChar(20)
+  defaultCityId   BigInt?  @map("default_city_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  account         Account  @relation(fields: [clientId], references: [accountId])
+  defaultCity     City?    @relation("client_default_city", fields: [defaultCityId], references: [cityId])
+
+  serviceRequests ServiceRequest[]
+
+  reviewsWritten  Review[] @relation("review_client")
+
+  @@map("profile_client")
+}
+
+model ProfileProvider {
+  providerId        BigInt    @id @map("provider_id")
+  businessName      String    @map("business_name") @db.VarChar(120)
+  logoUrl           String?   @map("logo_url") @db.VarChar(255)
+  description       String?   @db.Text
+  websiteUrl        String?   @map("website_url") @db.VarChar(255)
+  phone             String?   @db.VarChar(30)
+  approvalStatus    String    @map("approval_status") @db.VarChar(20)
+  approvedByAdminId BigInt?   @map("approved_by_admin_id")
+  approvedAt        DateTime? @map("approved_at")
+  avgRatingCached   Decimal?  @map("avg_rating_cached") @db.Decimal(3, 2)
+  reviewCountCached Int       @map("review_count_cached")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  account           Account   @relation(fields: [providerId], references: [accountId])
+
+  cities            ProviderCity[]
+  categories        ProviderCategory[]
+  services          Service[]
+  serviceRequests   ServiceRequest[]
+  reviewsReceived   Review[] @relation("review_provider")
+  reviewReplies     ReviewReply[]
+  payouts           Payout[]
+  transactions      PaymentTransaction[]
+
+  @@index([approvedByAdminId])
+  @@map("profile_provider")
+}
+
+model City {
+  cityId    BigInt   @id @default(autoincrement()) @map("city_id")
+  name      String   @db.VarChar(80)
+  timezone  String?  @db.VarChar(60)
+
+  defaultClients ProfileClient[] @relation("client_default_city")
+  providers      ProviderCity[]
+  requests       ServiceRequest[]
+
+  @@map("city")
+}
+
+model ProviderCity {
+  providerId BigInt   @map("provider_id")
+  cityId     BigInt   @map("city_id")
+  isPrimary  Boolean  @map("is_primary")
+
+  provider   ProfileProvider @relation(fields: [providerId], references: [providerId])
+  city       City            @relation(fields: [cityId], references: [cityId])
+
+  @@id([providerId, cityId])
+  @@map("provider_city")
+}
+
+model Category {
+  categoryId BigInt  @id @default(autoincrement()) @map("category_id")
+  name       String  @db.VarChar(80)
+  isActive   Boolean @map("is_active")
+
+  providers  ProviderCategory[]
+  services   Service[]
+
+  @@map("category")
+}
+
+model ProviderCategory {
+  providerId BigInt @map("provider_id")
+  categoryId BigInt @map("category_id")
+
+  provider   ProfileProvider @relation(fields: [providerId], references: [providerId])
+  category   Category        @relation(fields: [categoryId], references: [categoryId])
+
+  @@id([providerId, categoryId])
+  @@map("provider_category")
+}
+
+model Service {
+  serviceId     BigInt   @id @default(autoincrement()) @map("service_id")
+  providerId    BigInt   @map("provider_id")
+  categoryId    BigInt?  @map("category_id")
+  name          String   @db.VarChar(120)
+  description   String?  @db.Text
+  pricingModel  String   @map("pricing_model") @db.VarChar(20)
+  basePrice     Decimal? @map("base_price") @db.Decimal(10, 2)
+  currency      String   @default("CAD") @db.Char(3)
+  isActive      Boolean  @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  provider      ProfileProvider @relation(fields: [providerId], references: [providerId])
+  category      Category?       @relation(fields: [categoryId], references: [categoryId])
+
+  requests      ServiceRequest[]
+
+  @@index([providerId])
+  @@index([categoryId])
+  @@map("service")
+}
+
+model ServiceRequest {
+  requestId         BigInt    @id @default(autoincrement()) @map("request_id")
+  clientId          BigInt    @map("client_id")
+  providerId        BigInt    @map("provider_id")
+  serviceId         BigInt?   @map("service_id")
+  cityId            BigInt    @map("city_id")
+  detailsText       String    @map("details_text") @db.Text
+  requestedStartAt  DateTime? @map("requested_start_at")
+  requestedEndAt    DateTime? @map("requested_end_at")
+  status            String    @db.VarChar(30)
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  client            ProfileClient   @relation(fields: [clientId], references: [clientId])
+  provider          ProfileProvider @relation(fields: [providerId], references: [providerId])
+  service           Service?        @relation(fields: [serviceId], references: [serviceId])
+  city              City            @relation(fields: [cityId], references: [cityId])
+
+  transactions      PaymentTransaction[]
+  disputes          Dispute[]
+  reviews           Review[]
+
+  @@index([clientId])
+  @@index([providerId])
+  @@index([cityId])
+  @@map("service_request")
+}
+
+model Review {
+  reviewId         BigInt   @id @default(autoincrement()) @map("review_id")
+  providerId       BigInt   @map("provider_id")
+  clientId         BigInt   @map("client_id")
+  requestId        BigInt?  @map("request_id")
+  rating           Int
+  comment          String?  @db.Text
+  createdAt        DateTime @default(now()) @map("created_at")
+  isRemovedByAdmin Boolean  @map("is_removed_by_admin")
+  removedByAdminId BigInt?  @map("removed_by_admin_id")
+  removedReason    String?  @map("removed_reason") @db.VarChar(255)
+
+  provider         ProfileProvider @relation("review_provider", fields: [providerId], references: [providerId])
+  client           ProfileClient   @relation("review_client", fields: [clientId], references: [clientId])
+  request          ServiceRequest? @relation(fields: [requestId], references: [requestId])
+
+  replies          ReviewReply[]
+
+  @@index([providerId])
+  @@index([clientId])
+  @@index([requestId])
+  @@map("review")
+}
+
+model ReviewReply {
+  replyId    BigInt   @id @default(autoincrement()) @map("reply_id")
+  reviewId   BigInt   @map("review_id")
+  providerId BigInt   @map("provider_id")
+  replyText  String   @map("reply_text") @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  review     Review          @relation(fields: [reviewId], references: [reviewId])
+  provider   ProfileProvider @relation(fields: [providerId], references: [providerId])
+
+  @@index([reviewId])
+  @@map("review_reply")
+}
+
+model PaymentTransaction {
+  transactionId BigInt   @id @default(autoincrement()) @map("transaction_id")
+  requestId     BigInt   @map("request_id")
+  clientId      BigInt   @map("client_id")
+  providerId    BigInt   @map("provider_id")
+  amountGross   Decimal  @map("amount_gross") @db.Decimal(10, 2)
+  platformFee   Decimal  @map("platform_fee") @db.Decimal(10, 2)
+  amountNet     Decimal  @map("amount_net") @db.Decimal(10, 2)
+  currency      String   @default("CAD") @db.Char(3)
+  method        String   @db.VarChar(30)
+  status        String   @db.VarChar(30)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  request       ServiceRequest  @relation(fields: [requestId], references: [requestId])
+  provider      ProfileProvider @relation(fields: [providerId], references: [providerId])
+
+  escrow        Escrow?
+  payouts       Payout[]
+  invoices      Invoice[]
+
+  @@index([requestId])
+  @@map("payment_transaction")
+}
+
+model Escrow {
+  escrowId            BigInt    @id @default(autoincrement()) @map("escrow_id")
+  transactionId       BigInt    @unique @map("transaction_id")
+  heldAmount          Decimal   @map("held_amount") @db.Decimal(10, 2)
+  status              String    @db.VarChar(30)
+  disputeWindowEndsAt DateTime? @map("dispute_window_ends_at")
+  releasedAt          DateTime? @map("released_at")
+
+  transaction         PaymentTransaction @relation(fields: [transactionId], references: [transactionId])
+
+  @@index([transactionId])
+  @@map("escrow")
+}
+
+model Payout {
+  payoutId      BigInt    @id @default(autoincrement()) @map("payout_id")
+  providerId    BigInt    @map("provider_id")
+  transactionId BigInt    @map("transaction_id")
+  amount        Decimal   @db.Decimal(10, 2)
+  currency      String    @default("CAD") @db.Char(3)
+  status        String    @db.VarChar(30)
+  sentAt        DateTime? @map("sent_at")
+
+  provider      ProfileProvider    @relation(fields: [providerId], references: [providerId])
+  transaction   PaymentTransaction @relation(fields: [transactionId], references: [transactionId])
+
+  @@index([providerId])
+  @@index([transactionId])
+  @@map("payout")
+}
+
+model Invoice {
+  invoiceId      BigInt   @id @default(autoincrement()) @map("invoice_id")
+  transactionId  BigInt   @map("transaction_id")
+  invoiceNumber  String   @unique @map("invoice_number") @db.VarChar(60)
+  issuedAt       DateTime @map("issued_at")
+  pdfUrl         String?  @map("pdf_url") @db.VarChar(255)
+
+  transaction    PaymentTransaction @relation(fields: [transactionId], references: [transactionId])
+
+  @@index([transactionId])
+  @@map("invoice")
+}
+
+model Dispute {
+  disputeId          BigInt    @id @default(autoincrement()) @map("dispute_id")
+  requestId          BigInt    @map("request_id")
+  openedByAccountId  BigInt    @map("opened_by_account_id")
+  reasonCode         String    @map("reason_code") @db.VarChar(60)
+  notes              String?   @db.Text
+  status             String    @db.VarChar(30)
+  resolvedByAdminId  BigInt?   @map("resolved_by_admin_id")
+  resolvedAt         DateTime? @map("resolved_at")
+
+  request            ServiceRequest @relation(fields: [requestId], references: [requestId])
+
+  @@index([requestId])
+  @@index([openedByAccountId])
+  @@map("dispute")
 }

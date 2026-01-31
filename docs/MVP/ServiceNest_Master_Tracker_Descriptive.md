@@ -1,4 +1,3 @@
-
 # 🪺 ServiceNest — MVP v1.0 Master Tracker (Descriptive Edition)
 
 ## Purpose
@@ -160,6 +159,27 @@ Knex is permanently deprecated for this project.
 
 ---
 
+### 🔒 S2.02 Primary Key Standard — BIGINT AUTO_INCREMENT [LOCKED]
+
+#### Goal
+Ensure every table uses consistent primary keys that are fast, small, and easy to join.
+
+---
+
+### Decision
+For MVP v1.0:
+- All single-column primary keys must be: **BIGINT AUTO_INCREMENT**
+- UUID primary keys are not allowed in MVP v1.0
+- Join tables may use composite primary keys (provider_id + city_id, etc.)
+
+---
+
+### Prisma Rule (How we express this)
+- Use `BigInt @id @default(autoincrement())` for primary keys
+- Use `BigInt` for related foreign keys
+
+---
+
 ### Prisma Lock Rules
 - Prisma is the **only** approved migration tool
 - All schema changes must go through:
@@ -169,32 +189,33 @@ npx prisma migrate dev
 
 
 ### Tasks
-- Install MySQL
-- Create database
-- Verify connection
-- Configure backend DB connection
-- Run first migration
+- [DONE] Install MySQL
+- [DONE] Create database
+- [DONE] Verify connection
+- [DONE] Configure backend DB connection
+- [DONE] Run first migration
 
 Checkpoint:
 ✔ Backend connects to database successfully
 
 ---
 
-# SLICE 3 — AUTHENTICATION
+# SLICE 3 — AUTHENTICATION [DONE]
 
 ## Goal
 Allow users to register and login securely.
 
 ### Tasks
-- Define API contracts
-- Implement password hashing
-- Create JWT utilities
-- Build register/login endpoints
-- Add authentication middleware
+- [DONE] Define API contracts
+- [DONE] Implement password hashing
+- [DONE] Create JWT utilities
+- [DONE] Build register/login endpoints
+- [DONE] Add authentication middleware
 
 Checkpoint:
 ✔ User can register and login
 ✔ JWT issued successfully
+✔ Protected route works (/api/me)
 
 ---
 
