@@ -40,7 +40,35 @@ Lock scope, data model, and technology decisions to avoid future refactoring.
 
 ---
 
-# SLICE 1 — PROJECT BOOTSTRAP
+# SLICE 1 — PROJECT BOOTSTRAP [DONE]
+
+### 🔒 S1.XX Module System Lock — ESM Only (Whole Project) [LOCKED]
+
+#### Goal
+Ensure consistent module behavior across the entire project and eliminate runtime conflicts caused by mixing CommonJS and ESM.
+
+---
+
+### Decision
+The ServiceNest project will use **ESM (ECMAScript Modules)** exclusively across all environments.
+
+This applies to:
+- Backend code
+- Prisma configuration
+- Test scripts
+- Utility scripts
+- Future frontend tooling integrations
+
+---
+
+### Required Standards
+
+The following must remain in `package.json`:
+
+``json
+"type": "module"
+
+---
 
 ## Goal
 Set up backend and frontend structure so development can begin safely.
@@ -100,7 +128,7 @@ Checkpoint:
 
 ---
 
-### S1.04 Backend Health Test
+### S1.04 Backend Health Test [DONE]
 - Run dev server
 - Visit /api/health
 - Confirm JSON response
@@ -110,10 +138,35 @@ Checkpoint:
 
 ---
 
-# SLICE 2 — DATABASE SETUP
+# SLICE 2 — DATABASE SETUP [DONE]
 
 ## Goal
 Prepare database infrastructure for persistent data.
+
+### 🔒 S2.01 Database Tooling Lock — Prisma + ESM [LOCKED]
+
+#### Goal
+Ensure consistent migrations, eliminate tooling conflicts, and prevent future CommonJS/Knex issues.
+
+---
+
+### Decision
+The ServiceNest project will use **Prisma** exclusively for:
+- Database modeling
+- Schema migrations
+- Query access
+
+Knex is permanently deprecated for this project.
+
+---
+
+### Prisma Lock Rules
+- Prisma is the **only** approved migration tool
+- All schema changes must go through:
+- For Prisma Guide, see **ServiceNest_Prisma_Migration_Setup_Guide.md**
+``bash
+npx prisma migrate dev
+
 
 ### Tasks
 - Install MySQL
